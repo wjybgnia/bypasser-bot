@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Discord Bot",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/index.js",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "restart": true,
+            "runtimeExecutable": "node",
+            "env": {
+                "NODE_ENV": "development"
+            }
+        },
+        {
+            "name": "Deploy Commands",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/deploy-commands.js",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
