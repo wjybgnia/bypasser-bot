@@ -38,7 +38,7 @@ cd scriptblox-bot
 
 # Clone the repository
 echo "📥 Cloning repository..."
-git clone https://github.com/wjybgnia/Bypasser-Bot.git .
+git clone https://github.com/wjybgnia/scriptblox-discord-bot.git .
 
 # Install dependencies
 echo "📦 Installing Node.js dependencies..."

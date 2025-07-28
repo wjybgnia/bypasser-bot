@@ -46,7 +46,7 @@ app.post('/webhook', (req, res) => {
     const { ref, repository } = req.body;
 
     // Only process pushes to main branch
-    if (ref === 'refs/heads/main' && repository.name === 'Bypasser-Bot') {
+    if (ref === 'refs/heads/main' && repository.name === 'scriptblox-discord-bot') {
         log(`Received push to main branch from ${repository.full_name}`);
         
         // Execute update script

@@ -20,7 +20,7 @@ This guide sets up automatic updates for your ScriptBlox Discord bot whenever yo
 
 ### Step 2: Configure GitHub Webhook
 
-1. Go to your repository: https://github.com/wjybgnia/Bypasser-Bot
+1. Go to your repository: https://github.com/wjybgnia/scriptblox-discord-bot
 2. Click **Settings** → **Webhooks** → **Add webhook**
 3. Configure:
    - **Payload URL**: `http://YOUR_DROPLET_IP:3001/webhook`

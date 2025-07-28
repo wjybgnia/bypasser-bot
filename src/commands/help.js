@@ -34,7 +34,7 @@ module.exports = {
 					},
 					{
 						name: '🔗 Useful Links',
-						value: '[ScriptBlox Website](https://scriptblox.com)\n[API Documentation](https://scriptblox.com/docs)\n[Bot Source Code](https://github.com/wjybgnia/Bypasser-Bot)',
+						value: '[ScriptBlox Website](https://scriptblox.com)\n[API Documentation](https://scriptblox.com/docs)\n[Bot Source Code](https://github.com/wjybgnia/scriptblox-discord-bot)',
 						inline: false
 					}
 				],
