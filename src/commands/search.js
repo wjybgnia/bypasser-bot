@@ -15,6 +15,11 @@ module.exports = {
                 .setMinValue(1)
                 .setMaxValue(20)
                 .setRequired(false))
+        .addIntegerOption(option =>
+            option.setName('page')
+                .setDescription('Page number for pagination')
+                .setMinValue(1)
+                .setRequired(false))
         .addStringOption(option =>
             option.setName('mode')
                 .setDescription('Script type')
@@ -70,6 +75,7 @@ module.exports = {
         const query = interaction.options.getString('query');
         const options = {
             max: interaction.options.getInteger('limit') || 5,
+            page: interaction.options.getInteger('page') || 1,
             mode: interaction.options.getString('mode'),
             verified: interaction.options.getBoolean('verified'),
             key: interaction.options.getBoolean('key'),

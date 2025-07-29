@@ -30,6 +30,41 @@ module.exports = {
                 .setMinValue(1)
                 .setMaxValue(20)
                 .setRequired(false)
+        )
+        .addIntegerOption(option =>
+            option.setName('page')
+                .setDescription('Page number to start from (for pagination)')
+                .setMinValue(1)
+                .setRequired(false)
+        )
+        .addStringOption(option =>
+            option.setName('mode')
+                .setDescription('Script type filter')
+                .addChoices(
+                    { name: 'Free', value: 'free' },
+                    { name: 'Paid', value: 'paid' }
+                )
+                .setRequired(false)
+        )
+        .addBooleanOption(option =>
+            option.setName('verified')
+                .setDescription('Only verified scripts')
+                .setRequired(false)
+        )
+        .addBooleanOption(option =>
+            option.setName('key')
+                .setDescription('Scripts with key system')
+                .setRequired(false)
+        )
+        .addBooleanOption(option =>
+            option.setName('universal')
+                .setDescription('Universal scripts')
+                .setRequired(false)
+        )
+        .addBooleanOption(option =>
+            option.setName('patched')
+                .setDescription('Patched scripts')
+                .setRequired(false)
         ),
 
     async execute(interaction) {
@@ -38,12 +73,38 @@ module.exports = {
         try {
             const api = new ScriptBloxAPI();
             const limit = interaction.options.getInteger('limit') || 10;
+            const page = interaction.options.getInteger('page') || 1;
             
-            const data = await api.getTrendingScripts(limit);
+            // Collect filter options
+            const options = {
+                max: limit,
+                page: page,
+                sortBy: 'views', // For trending, we want most viewed
+                order: 'desc'
+            };
+            
+            // Add filter parameters if specified
+            const mode = interaction.options.getString('mode');
+            if (mode) options.mode = mode;
+            
+            const verified = interaction.options.getBoolean('verified');
+            if (verified !== null) options.verified = verified ? 1 : 0;
+            
+            const key = interaction.options.getBoolean('key');
+            if (key !== null) options.key = key ? 1 : 0;
+            
+            const universal = interaction.options.getBoolean('universal');
+            if (universal !== null) options.universal = universal ? 1 : 0;
+            
+            const patched = interaction.options.getBoolean('patched');
+            if (patched !== null) options.patched = patched ? 1 : 0;
+            
+            // Use the fetch endpoint for trending with view-based sorting
+            const data = await api.fetchScripts(options);
             
             if (!data.result?.scripts || data.result.scripts.length === 0) {
                 return await interaction.editReply({
-                    content: '❌ No trending scripts found.',
+                    content: '❌ No trending scripts found with the specified filters.',
                     flags: MessageFlags.Ephemeral
                 });
             }
@@ -59,6 +120,17 @@ module.exports = {
                 const description = formatted.description || 'No description available';
                 const descString = typeof description === 'string' ? description : String(description);
                 const finalDesc = descString.length > 200 ? descString.substring(0, 200) + '...' : descString;
+
+                // Generate filter summary for footer
+                const activeFilters = [];
+                if (mode) activeFilters.push(`Mode: ${mode}`);
+                if (verified !== null) activeFilters.push(`Verified: ${verified ? 'Yes' : 'No'}`);
+                if (key !== null) activeFilters.push(`Key: ${key ? 'Yes' : 'No'}`);
+                if (universal !== null) activeFilters.push(`Universal: ${universal ? 'Yes' : 'No'}`);
+                if (patched !== null) activeFilters.push(`Patched: ${patched ? 'Yes' : 'No'}`);
+                
+                const filterText = activeFilters.length > 0 ? ` • Filters: ${activeFilters.join(', ')}` : '';
+                const pageInfo = data.result.totalPages ? ` • API Page ${page} of ${data.result.totalPages}` : '';
 
                 const embed = new EmbedBuilder()
                     .setColor('#FF6B6B')
@@ -78,7 +150,7 @@ module.exports = {
                         { name: '📅 Created', value: formatted.createdAt ? new Date(formatted.createdAt).toLocaleDateString() : 'Unknown', inline: true }
                     )
                     .setFooter({ 
-                        text: `Page ${page + 1} of ${scripts.length}` 
+                        text: `Page ${page + 1} of ${scripts.length}${filterText}${pageInfo}` 
                     })
                     .setTimestamp();
 
