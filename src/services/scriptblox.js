@@ -290,20 +290,60 @@ class ScriptBloxAPI {
      * @returns {Promise<Object>} API status
      */
     async checkAPIHealth() {
-        try {
-            const response = await this.client.get('/health');
-            return {
-                status: 'healthy',
-                version: response.data.version || 'unknown',
-                timestamp: new Date().toISOString()
-            };
-        } catch (error) {
-            return {
-                status: 'unhealthy',
-                error: this.handleError(error).message,
-                timestamp: new Date().toISOString()
-            };
+        const endpoints = [
+            { name: 'search', endpoint: '/script/search', params: { q: 'test', max: 1 } },
+            { name: 'fetch', endpoint: '/script/fetch', params: { max: 1 } },
+            { name: 'trending', endpoint: '/script/trending', params: { max: 1 } },
+            { name: 'game', endpoint: '/script/fetch', params: { game: '920587237', max: 1 } }
+        ];
+
+        const results = [];
+        let workingCount = 0;
+
+        for (const test of endpoints) {
+            try {
+                const response = await this.client.get(test.endpoint, { params: test.params });
+                results.push({
+                    name: test.name,
+                    status: 'working',
+                    httpStatus: response.status
+                });
+                workingCount++;
+            } catch (error) {
+                results.push({
+                    name: test.name,
+                    status: 'blocked',
+                    httpStatus: error.response?.status || 'network_error',
+                    error: error.response?.data?.message || error.message
+                });
+            }
         }
+
+        // Determine overall status
+        let overallStatus;
+        let statusMessage;
+        
+        if (workingCount === endpoints.length) {
+            overallStatus = 'healthy';
+            statusMessage = 'All endpoints working';
+        } else if (workingCount > 0) {
+            overallStatus = 'partial';
+            statusMessage = `${workingCount}/${endpoints.length} endpoints working`;
+        } else {
+            overallStatus = 'unhealthy';
+            statusMessage = 'All endpoints blocked';
+        }
+
+        return {
+            status: overallStatus,
+            message: statusMessage,
+            endpoints: results,
+            workingCount,
+            totalCount: endpoints.length,
+            version: 'unknown',
+            timestamp: new Date().toISOString(),
+            error: workingCount === 0 ? 'ScriptBlox API access blocked by Cloudflare. Server IP may be blacklisted. Please contact support or use a different server.' : null
+        };
     }
 
     /**

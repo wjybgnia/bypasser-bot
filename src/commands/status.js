@@ -19,14 +19,28 @@ module.exports = {
                 api.getAPIVersion()
             ]);
 
+            // Determine color based on status
+            let embedColor;
+            switch (healthStatus.status) {
+                case 'healthy':
+                    embedColor = '#00FF00';
+                    break;
+                case 'partial':
+                    embedColor = '#FFA500';
+                    break;
+                default:
+                    embedColor = '#FF0000';
+            }
+
             const embed = new EmbedBuilder()
-                .setColor(healthStatus.status === 'healthy' ? '#00FF00' : '#FF0000')
+                .setColor(embedColor)
                 .setTitle('🔧 ScriptBlox API Status')
                 .setDescription(`API Health Check - ${healthStatus.status.toUpperCase()}`)
                 .addFields(
                     {
                         name: '🌐 API Status',
-                        value: healthStatus.status === 'healthy' ? '✅ Online' : '❌ Offline',
+                        value: healthStatus.status === 'healthy' ? '✅ Online' : 
+                               healthStatus.status === 'partial' ? '⚠️ Partially Available' : '❌ Offline',
                         inline: true
                     },
                     {
@@ -41,7 +55,7 @@ module.exports = {
                     },
                     {
                         name: '📊 API Version',
-                        value: versionInfo.version || 'Unknown',
+                        value: versionInfo.version || 'unknown',
                         inline: true
                     },
                     {
@@ -60,11 +74,25 @@ module.exports = {
                 })
                 .setTimestamp();
 
+            // Add endpoint status details
+            if (healthStatus.endpoints && healthStatus.endpoints.length > 0) {
+                const endpointStatus = healthStatus.endpoints.map(ep => {
+                    const statusIcon = ep.status === 'working' ? '✅' : '❌';
+                    return `${statusIcon} **${ep.name}**: ${ep.status}`;
+                }).join('\n');
+
+                embed.addFields({
+                    name: `📊 Endpoint Status (${healthStatus.workingCount}/${healthStatus.totalCount} working)`,
+                    value: endpointStatus,
+                    inline: false
+                });
+            }
+
             // Add error details if unhealthy
-            if (healthStatus.status === 'unhealthy') {
+            if (healthStatus.error) {
                 embed.addFields({
                     name: '❌ Error Details',
-                    value: `\`\`\`${healthStatus.error}\`\`\``,
+                    value: healthStatus.error,
                     inline: false
                 });
             }
@@ -76,6 +104,17 @@ module.exports = {
                     value: versionInfo.migration_required 
                         ? 'API migration is required. Some features may be deprecated.'
                         : 'API version is deprecated. Consider updating soon.',
+                    inline: false
+                });
+            }
+
+            // Add recommendations based on status
+            if (healthStatus.status === 'partial') {
+                embed.addFields({
+                    name: '💡 Recommendations',
+                    value: '• Use working endpoints: `/search`, `/featured`, `/trending`\n' +
+                           '• Avoid blocked endpoints until resolved\n' +
+                           '• Check server logs for Cloudflare blocking issues',
                     inline: false
                 });
             }
