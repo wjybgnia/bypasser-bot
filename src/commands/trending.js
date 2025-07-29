@@ -82,11 +82,21 @@ module.exports = {
                     })
                     .setTimestamp();
 
-                if (formatted.gameImageUrl && formatted.gameImageUrl.trim() !== '' && formatted.gameImageUrl !== '/images/no-script.webp') {
-                    const thumbnailUrl = getValidThumbnailUrl(formatted.gameImageUrl);
-                    if (thumbnailUrl) {
-                        embed.setThumbnail(thumbnailUrl);
-                    }
+                // Set thumbnail - prioritize script image, then game image
+                let thumbnailUrl = null;
+                
+                // Try script's own image first
+                if (formatted.imageUrl && formatted.imageUrl.trim() !== '' && formatted.imageUrl !== '/images/no-script.webp') {
+                    thumbnailUrl = getValidThumbnailUrl(formatted.imageUrl);
+                }
+                
+                // Fall back to game image if no script image
+                if (!thumbnailUrl && formatted.gameImageUrl && formatted.gameImageUrl.trim() !== '' && formatted.gameImageUrl !== '/images/no-script.webp') {
+                    thumbnailUrl = getValidThumbnailUrl(formatted.gameImageUrl);
+                }
+                
+                if (thumbnailUrl) {
+                    embed.setThumbnail(thumbnailUrl);
                 }
 
                 return embed;
@@ -199,11 +209,21 @@ module.exports = {
                                     { name: '📅 Created', value: formatted.createdAt ? new Date(formatted.createdAt).toLocaleDateString() : 'Unknown', inline: true }
                                 );
                             
-                            if (formatted.gameImageUrl && formatted.gameImageUrl.trim() !== '' && formatted.gameImageUrl !== '/images/no-script.webp') {
-                                const thumbnailUrl = getValidThumbnailUrl(formatted.gameImageUrl);
-                                if (thumbnailUrl) {
-                                    detailEmbed.setThumbnail(thumbnailUrl);
-                                }
+                            // Set thumbnail - prioritize script image, then game image
+                            let detailThumbnailUrl = null;
+                            
+                            // Try script's own image first
+                            if (formatted.imageUrl && formatted.imageUrl.trim() !== '' && formatted.imageUrl !== '/images/no-script.webp') {
+                                detailThumbnailUrl = getValidThumbnailUrl(formatted.imageUrl);
+                            }
+                            
+                            // Fall back to game image if no script image
+                            if (!detailThumbnailUrl && formatted.gameImageUrl && formatted.gameImageUrl.trim() !== '' && formatted.gameImageUrl !== '/images/no-script.webp') {
+                                detailThumbnailUrl = getValidThumbnailUrl(formatted.gameImageUrl);
+                            }
+                            
+                            if (detailThumbnailUrl) {
+                                detailEmbed.setThumbnail(detailThumbnailUrl);
                             }
                             
                             await buttonInteraction.reply({
