@@ -151,8 +151,9 @@ class ScriptBloxAPI {
 
     /**
      * Get a specific script by ID
+     * Response format: { "script": { "_id": "string", "title": "string", ... } }
      * @param {string} scriptId - Script ID
-     * @returns {Promise<Object>} Script details
+     * @returns {Promise<Object>} Script details wrapped in script object
      */
     async getScript(scriptId) {
         try {
@@ -165,6 +166,7 @@ class ScriptBloxAPI {
 
     /**
      * Get raw script content by ID
+     * Response format: Raw script content as string
      * @param {string} scriptId - Script ID
      * @returns {Promise<Object>} Raw script content
      */
@@ -295,42 +297,62 @@ class ScriptBloxAPI {
     }
 
     /**
-     * Format script data for Discord embeds
-     * @param {Object} script - Script object from API
+     * Format script data for Discord embeds - aligned with official API response structure
+     * @param {Object} script - Script object from API (matches official response structure)
      * @returns {Object} Formatted script data
      */
     formatScript(script) {
         return {
+            // Basic script info
             id: script._id || script.id,
             title: script.title || 'Untitled Script',
             description: String(script.description || script.features || 'No description available'),
+            
+            // Game information
             game: script.game?.name || 'Unknown Game',
             gameId: script.game?.gameId || script.game?._id || 'N/A',
+            gameImageUrl: script.game?.imageUrl || '',
+            
+            // Owner information  
             owner: script.owner?.username || 'Unknown',
+            ownerId: script.owner?._id || 'N/A',
             ownerVerified: script.owner?.verified || false,
             ownerProfilePicture: script.owner?.profilePicture || '',
             ownerStatus: script.owner?.status || '',
+            
+            // Script properties
             verified: script.verified || false,
             key: script.key || false,
             keyLink: script.keyLink || '',
+            scriptType: script.scriptType || script.mode || 'Unknown',
+            isUniversal: script.isUniversal || script.universal || false,
+            isPatched: script.isPatched || script.patched || false,
+            visibility: script.visibility || 'public',
+            
+            // Media and metadata
+            imageUrl: script.image || script.imageUrl || '',
+            slug: script.slug || '',
+            tags: script.tags || [],
+            features: script.features || '',
+            
+            // Statistics
             views: script.views || 0,
             likes: script.likes || script.likeCount || 0,
             dislikes: script.dislikes || script.dislikeCount || 0,
-            isUniversal: script.isUniversal || script.universal || false,
-            isPatched: script.isPatched || script.patched || false,
-            scriptType: script.scriptType || script.mode || 'Unknown',
-            visibility: script.visibility || 'public',
-            tags: script.tags || [],
-            features: script.features || '',
-            slug: script.slug || '',
-            imageUrl: script.image || script.imageUrl || '',
-            gameImageUrl: script.game?.imageUrl || '',
+            
+            // User interaction flags
             liked: script.liked || false,
             disliked: script.disliked || false,
             isFav: script.isFav || false,
+            
+            // Search-specific data
             matched: script.matched || [], // Search matches
+            
+            // Timestamps
             createdAt: script.createdAt || script.created || null,
             updatedAt: script.updatedAt || script.updated || undefined,
+            
+            // Generated fields
             url: `https://scriptblox.com/script/${script._id || script.id}`,
             script: script.script || 'No script content available'
         };
@@ -345,7 +367,9 @@ class ScriptBloxAPI {
             { name: 'search', endpoint: '/script/search', params: { q: 'test', max: 1 } },
             { name: 'fetch', endpoint: '/script/fetch', params: { max: 1 } },
             { name: 'trending', endpoint: '/script/trending', params: { max: 1 } },
-            { name: 'game', endpoint: '/script/fetch', params: { game: '920587237', max: 1 } }
+            { name: 'game', endpoint: '/script/fetch', params: { game: '920587237', max: 1 } },
+            { name: 'script', endpoint: '/script/65a5c6c0ddf7e3bb89b21e6b', params: {} },
+            { name: 'raw', endpoint: '/script/raw/65a5c6c0ddf7e3bb89b21e6b', params: {} }
         ];
 
         const results = [];
