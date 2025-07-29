@@ -1,6 +1,35 @@
 # Auto-Update Setup Guide
 
-## Overview
+## 🚨 **WEBHOOK TROUBLESHOOTING - SIGNATURE ISSUE IDENTIFIED**
+
+The webhook server is **WORKING** and receiving GitHub requests, but failing signature verification.
+
+### 🔍 **Current Status:**
+- ✅ Webhook server listening on port 3001
+- ✅ GitHub sending push events to server  
+- ❌ Signature verification failing
+
+### 🔧 **REQUIRED FIX:**
+
+**GitHub Webhook Settings:** `https://github.com/wjybgnia/Bypasser-Bot/settings/hooks`
+
+1. **Payload URL**: `http://157.230.40.134:3001/webhook` ✅
+2. **Content Type**: **`application/json`** ⚠️ **CRITICAL - Must be JSON!**
+3. **Secret**: `scriptblox-webhook-secret-2025` ✅  
+4. **Events**: Push events ✅
+5. **Active**: Enabled ✅
+
+### 📋 **Most Common Issue:**
+Content Type set to `application/x-www-form-urlencoded` instead of `application/json`
+
+### 🧪 **Test Results:**
+- Webhook server: ONLINE and receiving requests
+- Signature verification: FAILING (wrong content type suspected)
+- Auto-update system: Ready once signature fixed
+
+---
+
+## 🚀 Auto-Update System Setup Guide
 This guide sets up automatic updates for your ScriptBlox Discord bot whenever you push changes to your GitHub repository.
 
 ## Method 1: GitHub Webhook + Simple Server (Recommended)
