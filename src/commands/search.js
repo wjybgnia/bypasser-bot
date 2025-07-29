@@ -134,12 +134,18 @@ module.exports = {
                         ? formatted.description.substring(0, 200) + '...' 
                         : formatted.description)
                     .addFields(
-                        { name: '🎮 Game', value: formatted.game, inline: true },
+                        { name: '� Script ID', value: formatted.id, inline: true },
+                        { name: '�🎮 Game', value: formatted.game, inline: true },
                         { name: '👤 Author', value: formatted.owner, inline: true },
                         { name: '👁️ Views', value: formatted.views.toString(), inline: true },
                         { name: '👍 Likes', value: formatted.likes.toString(), inline: true },
                         { name: '👎 Dislikes', value: formatted.dislikes.toString(), inline: true },
-                        { name: '✅ Verified', value: formatted.verified ? 'Yes' : 'No', inline: true }
+                        { name: '✅ Verified', value: formatted.verified ? 'Yes' : 'No', inline: true },
+                        { name: '🔑 Key Required', value: formatted.key ? 'Yes' : 'No', inline: true },
+                        { name: '💰 Script Type', value: formatted.scriptType, inline: true },
+                        { name: '🌐 Universal', value: formatted.isUniversal ? 'Yes' : 'No', inline: true },
+                        { name: '🔧 Patched', value: formatted.isPatched ? 'Yes' : 'No', inline: true },
+                        { name: '📅 Created', value: formatted.createdAt ? new Date(formatted.createdAt).toLocaleDateString() : 'Unknown', inline: true }
                     );
 
                 // Add search matches if available
@@ -152,11 +158,7 @@ module.exports = {
                     });
                 }
 
-                if (formatted.key) {
-                    embed.addFields({ name: '� Key Required', value: 'Yes', inline: true });
-                }
-
-                embed.setFooter({ text: `Script ID: ${formatted.id}` })
+                embed.setFooter({ text: `Search Result ${index + 1} of ${scripts.length}` })
                      .setTimestamp();
 
                 embeds.push(embed);

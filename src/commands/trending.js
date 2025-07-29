@@ -66,15 +66,19 @@ module.exports = {
                     .setURL(formatted.url)
                     .setDescription(finalDesc)
                     .addFields(
-                        { name: '🎮 Game', value: formatted.game, inline: true },
+                        { name: '� Script ID', value: formatted.id, inline: true },
+                        { name: '�🎮 Game', value: formatted.game, inline: true },
                         { name: '👤 Author', value: formatted.owner, inline: true },
                         { name: '👁️ Views', value: formatted.views.toString(), inline: true },
                         { name: '👍 Likes', value: formatted.likes.toString(), inline: true },
                         { name: '🔑 Key System', value: formatted.key ? 'Yes' : 'No', inline: true },
-                        { name: '🌐 Universal', value: formatted.isUniversal ? 'Yes' : 'No', inline: true }
+                        { name: '💰 Script Type', value: formatted.scriptType, inline: true },
+                        { name: '🌐 Universal', value: formatted.isUniversal ? 'Yes' : 'No', inline: true },
+                        { name: '🔧 Patched', value: formatted.isPatched ? 'Yes' : 'No', inline: true },
+                        { name: '📅 Created', value: formatted.createdAt ? new Date(formatted.createdAt).toLocaleDateString() : 'Unknown', inline: true }
                     )
                     .setFooter({ 
-                        text: `Page ${page + 1} of ${scripts.length} • Script ID: ${formatted.id}` 
+                        text: `Page ${page + 1} of ${scripts.length}` 
                     })
                     .setTimestamp();
 
@@ -181,15 +185,18 @@ module.exports = {
                                 .setURL(formatted.url)
                                 .setDescription(String(formatted.description || 'No description available'))
                                 .addFields(
-                                    { name: '🎮 Game', value: formatted.game, inline: true },
+                                    { name: '� Script ID', value: formatted.id, inline: true },
+                                    { name: '�🎮 Game', value: formatted.game, inline: true },
                                     { name: '👤 Author', value: formatted.owner, inline: true },
                                     { name: '👁️ Views', value: formatted.views.toString(), inline: true },
                                     { name: '👍 Likes', value: formatted.likes.toString(), inline: true },
                                     { name: '👎 Dislikes', value: formatted.dislikes.toString(), inline: true },
                                     { name: '🔑 Key System', value: formatted.key ? 'Yes' : 'No', inline: true },
                                     { name: '✅ Verified', value: formatted.verified ? 'Yes' : 'No', inline: true },
+                                    { name: '💰 Script Type', value: formatted.scriptType, inline: true },
                                     { name: '🌐 Universal', value: formatted.isUniversal ? 'Yes' : 'No', inline: true },
-                                    { name: '🔧 Type', value: formatted.scriptType, inline: true }
+                                    { name: '🔧 Patched', value: formatted.isPatched ? 'Yes' : 'No', inline: true },
+                                    { name: '📅 Created', value: formatted.createdAt ? new Date(formatted.createdAt).toLocaleDateString() : 'Unknown', inline: true }
                                 );
                             
                             if (formatted.gameImageUrl && formatted.gameImageUrl.trim() !== '' && formatted.gameImageUrl !== '/images/no-script.webp') {
