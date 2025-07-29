@@ -52,11 +52,10 @@
 	- Thumbnail URL validation and image handling
 	- Rate limiting and timeout protection
 
-- [x] Discord Bot Commands Complete (9 total)
+- [x] Discord Bot Commands Complete (8 total)
 	- `/search` - Advanced script search with filters
 	- `/featured` - Featured scripts from homepage
 	- `/trending` - Community trending scripts with navigation
-	- `/filter` - Advanced filtering with multiple options
 	- `/script` - Detailed script information
 	- `/raw` - Raw script code display
 	- `/game` - Game-specific scripts

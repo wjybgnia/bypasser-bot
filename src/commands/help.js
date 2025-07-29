@@ -14,7 +14,7 @@ module.exports = {
 				fields: [
 					{
 						name: '🔍 Search Commands',
-						value: '`/search <query>` - Search for scripts\n`/filter` - Advanced search with filters\n`/game <game>` - Get scripts for specific game',
+						value: '`/search <query>` - Search for scripts with advanced filters\n`/game <game>` - Get scripts for specific game',
 						inline: false
 					},
 					{

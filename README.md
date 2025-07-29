@@ -30,7 +30,6 @@ A Discord bot that integrates with the ScriptBlox API to provide easy access to 
 |---------|-------------|-------|
 | `/search` | Search for scripts | `/search <query> [limit]` |
 | `/featured` | Get featured scripts | `/featured [limit]` |
-| `/filter` | Advanced script filtering | `/filter [mode] [verified] [key] [universal] [patched] [sortby] [order] [limit]` |
 | `/script` | Get script details | `/script <id>` |
 | `/game` | Get scripts for a game | `/game <game_id> [limit]` |
 | `/help` | Show help information | `/help` |
