@@ -28,7 +28,7 @@ module.exports = {
             
             // Try direct game endpoint first
             try {
-                results = await api.getGameScripts(gameId, 1, limit);
+                results = await api.getGameScripts(gameId, { max: limit });
             } catch (directError) {
                 // If direct game endpoint fails, try search as fallback
                 console.log('Game endpoint failed, trying search fallback...');

@@ -147,10 +147,21 @@ class ScriptBloxAPI {
     async getGameScripts(gameId, options = {}) {
         try {
             const params = {
+                game: gameId,  // Use game parameter as per API docs
+                page: options.page || 1,
                 max: Math.min(options.max || 10, 20)
             };
 
-            const response = await this.client.get(`/script/game/${gameId}`, { params });
+            // Add other optional parameters if provided
+            if (options.mode) params.mode = options.mode;
+            if (options.verified !== undefined) params.verified = options.verified ? 1 : 0;
+            if (options.key !== undefined) params.key = options.key ? 1 : 0;
+            if (options.universal !== undefined) params.universal = options.universal ? 1 : 0;
+            if (options.patched !== undefined) params.patched = options.patched ? 1 : 0;
+            if (options.sortBy) params.sortBy = options.sortBy;
+            if (options.order) params.order = options.order;
+
+            const response = await this.client.get('/script/fetch', { params });
             return response.data;
         } catch (error) {
             throw this.handleError(error);
