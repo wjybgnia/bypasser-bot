@@ -64,36 +64,54 @@ module.exports = {
                     { name: 'Ascending (Low to High)', value: 'asc' }
                 )
                 .setRequired(false))
+        .addStringOption(option =>
+            option.setName('creator')
+                .setDescription('Search by creator username')
+                .setRequired(false))
         .addBooleanOption(option =>
             option.setName('strict')
                 .setDescription('Enable strict searching (more precise results)')
                 .setRequired(false)),
 
     async execute(interaction) {
-        await interaction.deferReply();
-
-        const query = interaction.options.getString('query');
-        const options = {
-            max: interaction.options.getInteger('limit') || 20, // Match official API default
-            page: interaction.options.getInteger('page') || 1,
-            mode: interaction.options.getString('mode'),
-            verified: interaction.options.getBoolean('verified'),
-            key: interaction.options.getBoolean('key'),
-            universal: interaction.options.getBoolean('universal'),
-            patched: interaction.options.getBoolean('patched'),
-            sortBy: interaction.options.getString('sortby'),
-            order: interaction.options.getString('order') || 'desc',
-            strict: interaction.options.getBoolean('strict') !== false // Default to true as per API docs
-        };
-
-        // Remove null/undefined values
-        Object.keys(options).forEach(key => {
-            if (options[key] === null || options[key] === undefined) {
-                delete options[key];
-            }
-        });
+        let isDeferred = false;
 
         try {
+            // Try to defer reply, but handle if already acknowledged
+            if (!interaction.deferred && !interaction.replied) {
+                await interaction.deferReply();
+                isDeferred = true;
+            }
+
+            const query = interaction.options.getString('query');
+            const options = {
+                max: interaction.options.getInteger('limit') || 20,
+                page: interaction.options.getInteger('page') || 1,
+                mode: interaction.options.getString('mode'),
+                verified: interaction.options.getBoolean('verified'),
+                key: interaction.options.getBoolean('key'),
+                universal: interaction.options.getBoolean('universal'),
+                patched: interaction.options.getBoolean('patched'),
+                sortBy: interaction.options.getString('sortby'),
+                order: interaction.options.getString('order') || 'desc',
+                creator: interaction.options.getString('creator')
+            };
+
+            // Validate required query parameter
+            if (!query) {
+                const embed = new EmbedBuilder()
+                    .setColor('#ff6b6b')
+                    .setTitle('❌ Error')
+                    .setDescription('Please provide a search query.')
+                    .setTimestamp();
+
+                if (isDeferred) {
+                    return await interaction.editReply({ embeds: [embed] });
+                } else {
+                    return await interaction.reply({ embeds: [embed] });
+                }
+            }
+
             const api = new ScriptBloxAPI();
             const results = await api.searchScripts(query, options);
 
@@ -101,87 +119,104 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setColor('#ff6b6b')
                     .setTitle('🔍 Search Results')
-                    .setDescription(`No scripts found for "${query}"`)
+                    .setDescription(`No scripts found for query: "${query}"`)
+                    .addFields(
+                        { name: '💡 Suggestions', value: '• Try different keywords\n• Check your spelling\n• Use broader search terms\n• Remove filters to expand results' }
+                    )
                     .setTimestamp();
 
-                return await interaction.editReply({ embeds: [embed] });
+                if (isDeferred) {
+                    return await interaction.editReply({ embeds: [embed] });
+                } else {
+                    return await interaction.reply({ embeds: [embed] });
+                }
             }
 
-            const scripts = results.result.scripts.slice(0, options.max || 5);
+            const scripts = results.result.scripts;
+            const totalFound = results.result.totalFound || scripts.length;
+            
+            // Create embeds for scripts (limit to avoid Discord limits)
             const embeds = [];
+            const maxScripts = Math.min(scripts.length, 10); // Limit to 10 scripts max
 
-            // Create filter description
-            const filterDesc = [];
-            if (options.mode) filterDesc.push(`Mode: ${options.mode}`);
-            if (options.verified !== undefined) filterDesc.push(`Verified: ${options.verified ? 'Yes' : 'No'}`);
-            if (options.key !== undefined) filterDesc.push(`Key Required: ${options.key ? 'Yes' : 'No'}`);
-            if (options.universal !== undefined) filterDesc.push(`Universal: ${options.universal ? 'Yes' : 'No'}`);
-            if (options.patched !== undefined) filterDesc.push(`Patched: ${options.patched ? 'Yes' : 'No'}`);
-            if (options.sortBy) filterDesc.push(`Sorted by: ${options.sortBy} (${options.order})`);
-            if (options.strict !== undefined) filterDesc.push(`Strict: ${options.strict ? 'Yes' : 'No'}`);
-
-            // Main results embed
+            // Main search results embed
             const mainEmbed = new EmbedBuilder()
-                .setColor('#4ecdc4')
+                .setColor('#00d4aa')
                 .setTitle('🔍 Search Results')
-                .setDescription(`Found scripts for "${query}"\nShowing ${scripts.length} results${filterDesc.length > 0 ? `\n**Filters:** ${filterDesc.join(', ')}` : ''}`)
-                .setTimestamp();
+                .setDescription(`Found **${totalFound}** scripts for: "${query}"\nShowing ${maxScripts} results`)
+                .addFields(
+                    { name: '📄 Page', value: `${options.page}`, inline: true },
+                    { name: '📊 Per Page', value: `${options.max}`, inline: true },
+                    { name: '🎯 Results', value: `${maxScripts}/${totalFound}`, inline: true }
+                );
 
+            if (options.mode) mainEmbed.addFields({ name: '🎮 Mode', value: options.mode, inline: true });
+            if (options.verified !== null) mainEmbed.addFields({ name: '✅ Verified', value: options.verified ? 'Yes' : 'No', inline: true });
+            if (options.sortBy) mainEmbed.addFields({ name: '📈 Sort', value: `${options.sortBy} (${options.order})`, inline: true });
+
+            mainEmbed.setTimestamp();
             embeds.push(mainEmbed);
 
-            for (const script of scripts) {
+            // Add script embeds
+            for (let i = 0; i < maxScripts; i++) {
+                const script = scripts[i];
                 const formatted = api.formatScript(script);
                 
                 const embed = new EmbedBuilder()
-                    .setColor('#4ecdc4')
+                    .setColor('#ffd93d')
                     .setTitle(`📜 ${formatted.title}`)
                     .setURL(formatted.url)
-                    .setDescription(formatted.description.length > 200 
-                        ? formatted.description.substring(0, 200) + '...' 
+                    .setDescription(formatted.description.length > 150 
+                        ? formatted.description.substring(0, 150) + '...' 
                         : formatted.description)
                     .addFields(
-                        { name: '� Script ID', value: formatted.id, inline: true },
-                        { name: '�🎮 Game', value: formatted.game, inline: true },
+                        { name: '🆔 ID', value: formatted.id, inline: true },
+                        { name: '🎮 Game', value: formatted.game, inline: true },
                         { name: '👤 Author', value: formatted.owner, inline: true },
                         { name: '👁️ Views', value: formatted.views.toString(), inline: true },
                         { name: '👍 Likes', value: formatted.likes.toString(), inline: true },
-                        { name: '👎 Dislikes', value: formatted.dislikes.toString(), inline: true },
-                        { name: '✅ Verified', value: formatted.verified ? 'Yes' : 'No', inline: true },
-                        { name: '🔑 Key Required', value: formatted.key ? 'Yes' : 'No', inline: true },
-                        { name: '💰 Script Type', value: formatted.scriptType, inline: true },
-                        { name: '🌐 Universal', value: formatted.isUniversal ? 'Yes' : 'No', inline: true },
-                        { name: '🔧 Patched', value: formatted.isPatched ? 'Yes' : 'No', inline: true },
-                        { name: '📅 Created', value: formatted.createdAt ? new Date(formatted.createdAt).toLocaleDateString() : 'Unknown', inline: true }
-                    );
+                        { name: '👎 Dislikes', value: formatted.dislikes.toString(), inline: true }
+                    )
+                    .setFooter({ text: `Result ${i + 1} of ${maxScripts} • Script ID: ${formatted.id}` })
+                    .setTimestamp();
 
-                // Add search matches if available
-                if (formatted.matched && formatted.matched.length > 0) {
-                    const matchText = formatted.matched.slice(0, 3).map(match => `\`${match}\``).join(', ');
-                    embed.addFields({ 
-                        name: '🎯 Matches', 
-                        value: formatted.matched.length > 3 ? `${matchText} and ${formatted.matched.length - 3} more...` : matchText, 
-                        inline: false 
-                    });
-                }
-
-                embed.setFooter({ text: `Search Result ${index + 1} of ${scripts.length}` })
-                     .setTimestamp();
+                // Add verification status
+                if (formatted.verified) embed.addFields({ name: '✅ Status', value: 'Verified', inline: true });
+                if (formatted.key) embed.addFields({ name: '🔑 Key', value: 'Required', inline: true });
 
                 embeds.push(embed);
             }
 
-            await interaction.editReply({ embeds: embeds });
+            if (isDeferred) {
+                await interaction.editReply({ embeds: embeds });
+            } else {
+                await interaction.reply({ embeds: embeds });
+            }
 
         } catch (error) {
             console.error('Search command error:', error);
             
-            const errorEmbed = new EmbedBuilder()
-                .setColor('#ff6b6b')
-                .setTitle('❌ Error')
-                .setDescription('Failed to search scripts. Please try again later.')
-                .setTimestamp();
+            // Handle defer error specifically
+            if (error.code === 40060) {
+                console.log('Interaction already acknowledged before defer');
+                return;
+            }
+            
+            try {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor('#ff6b6b')
+                    .setTitle('❌ Error')
+                    .setDescription('Failed to search scripts. Please try again later.')
+                    .setTimestamp();
 
-            await interaction.editReply({ embeds: [errorEmbed] });
+                if (isDeferred) {
+                    await interaction.editReply({ embeds: [errorEmbed] });
+                } else if (!interaction.replied) {
+                    await interaction.reply({ embeds: [errorEmbed] });
+                }
+            } catch (replyError) {
+                console.error('Failed to send error message:', replyError);
+            }
         }
     },
 };

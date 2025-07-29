@@ -180,14 +180,17 @@ class ScriptBloxAPI {
      */
     async getFeaturedScripts(limit = 10) {
         try {
-            const response = await this.client.get('/script/fetch', {
+            console.log(`[DEBUG] Fetching featured scripts with limit: ${limit}`);
+            // Use trending endpoint since there's no dedicated featured endpoint
+            const response = await this.client.get('/script/trending', {
                 params: {
-                    page: 1,
                     max: Math.min(limit, 20)
                 }
             });
+            console.log(`[DEBUG] Featured scripts API response:`, response.data);
             return response.data;
         } catch (error) {
+            console.error('[ERROR] getFeaturedScripts failed:', error.message);
             throw this.handleError(error);
         }
     }

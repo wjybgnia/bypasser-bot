@@ -52,10 +52,29 @@ client.on('interactionCreate', async interaction => {
         await command.execute(interaction);
     } catch (error) {
         console.error(`Error executing slash command ${interaction.commandName}:`, error);
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: '❌ There was an error while executing this command!', ephemeral: true });
-        } else {
-            await interaction.reply({ content: '❌ There was an error while executing this command!', ephemeral: true });
+        
+        try {
+            // Check if this is an "Unknown interaction" error
+            if (error.code === 10062) {
+                console.log('Interaction expired - this is normal for slow commands');
+                return;
+            }
+            
+            // Check if this is an "already acknowledged" error
+            if (error.code === 40060) {
+                console.log('Interaction already acknowledged - this is normal for fast responses');
+                return;
+            }
+
+            const errorMessage = '❌ There was an error while executing this command!';
+            
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp({ content: errorMessage, ephemeral: true });
+            } else {
+                await interaction.reply({ content: errorMessage, ephemeral: true });
+            }
+        } catch (replyError) {
+            console.error('Failed to send error message:', replyError);
         }
     }
 });

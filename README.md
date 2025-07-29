@@ -1,218 +1,256 @@
 # ScriptBlox Discord Bot
 
-A Discord bot that integrates with the ScriptBlox API to provide easy access to Roblox scripts directly from Discord.
+A powerful Discord bot that integrates with the ScriptBlox API to provide comprehensive Roblox script search, browsing, and information features.
 
-## Features
+## 🚀 Features
 
-- 🔍 **Advanced Search**: Search with multiple filters, sorting options, and relevance ranking
-- ⭐ **Featured Scripts**: Get the latest featured scripts from ScriptBlox homepage
-- � **Trending Scripts**: View community's most interactive scripts
-- 🎮 **Game Scripts**: Find scripts for specific Roblox games
-- 📜 **Script Details**: View detailed information about specific scripts
-- 💻 **Raw Script Code**: View script code directly in Discord
-- � **Advanced Filtering**: Filter scripts by type, verification status, key requirements, and more
-- 📊 **Sorting Options**: Sort by views, likes, creation date, relevance, and more
-- 🎯 **Search Matches**: See which parts of scripts matched your search query
-- 🔐 **Key Links**: Direct access to script key pages when available
-- 🔗 **Direct Links**: Quick access to ScriptBlox website
-- 💡 **API Health**: Monitor ScriptBlox API status and compatibility
+- **🔍 Advanced Script Search** - Search scripts with filters (game, type, verification status)
+- **📈 Trending Scripts** - Browse community trending scripts with pagination
+- **📋 Script Details** - Get comprehensive script information and metadata
+- **💻 Raw Script Access** - View and copy raw script code directly
+- **🎮 Game-Specific Scripts** - Find scripts for specific Roblox games
+- **📚 Interactive Help** - Comprehensive command documentation
+- **🎨 Rich Embeds** - Beautiful Discord embeds with interactive buttons
+- **⚡ Real-time Updates** - Latest data from ScriptBlox API
 
-## Commands
-
-| Command | Description | Usage | Parameters |
-|---------|-------------|-------|------------|
-| `/search` | Search for scripts with advanced filters | `/search <query>` | query, limit, mode, verified, key, universal, patched, strict, sortby, order |
-| `/featured` | Get featured scripts from homepage | `/featured` | limit |
-| `/trending` | Get community most interactive scripts | `/trending` | limit |
-| `/game` | Get scripts for a specific game | `/game <game_id>` | game_id, limit |
-| `/script` | Get detailed script information | `/script <script_id>` | script_id |
-| `/raw` | Get raw script code | `/raw <script_id>` | script_id |
-| `/status` | Check ScriptBlox API health status | `/status` | - |
-| `/help` | Show comprehensive help information | `/help` | - |
-
-## Quick Setup (Heroku)
+## 📦 Installation
 
 ### Prerequisites
+- **Node.js** 16.0.0 or higher
+- **Discord Application** with bot permissions
+- **Git** (for cloning)
 
-- Node.js 16.0.0 or higher
-- Discord Application and Bot Token
-- ScriptBlox API access (optional for enhanced features)
-### 🚀 Easy Deployment (Recommended)
+### Quick Setup
 
-**Option 1: Automated Script**
-```bash
-# Windows
-.\deploy-heroku.bat
-
-# Mac/Linux
-chmod +x deploy-heroku.sh
-./deploy-heroku.sh
-```
-
-**Option 2: Manual Heroku Deployment**
-1. Install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
-2. Login: `heroku login`
-3. Create app: `heroku create your-bot-name`
-4. Set environment variables:
-   ```bash
-   heroku config:set DISCORD_TOKEN=your_discord_bot_token
-   heroku config:set CLIENT_ID=your_discord_client_id
-   heroku config:set GUILD_ID=your_discord_guild_id_optional
-   ```
-5. Deploy: `git push heroku main`
-6. Scale worker: `heroku ps:scale worker=1`
-
-## Local Setup Instructions
-
-### Prerequisites
-
-- Node.js 16.0.0 or higher
-- Discord Application and Bot Token
-- Git
-
-### Installation
-
-1. **Clone and setup the project**:
+1. **Clone the repository**
    ```bash
    git clone https://github.com/wjybgnia/scriptblox-discord-bot.git
    cd scriptblox-discord-bot
+   ```
+
+2. **Install dependencies**
+   ```bash
    npm install
    ```
 
-2. **Create a Discord Application**:
-   - Go to [Discord Developer Portal](https://discord.com/developers/applications)
-   - Create a new application
-   - Go to "Bot" section and create a bot
-   - Copy the bot token
-   - Note down the Application ID (Client ID)
-
-3. **Configure environment variables**:
+3. **Configure environment**
    ```bash
    cp .env.example .env
    ```
-   
-   Edit `.env` file with your values:
+   Edit `.env` with your Discord bot credentials:
    ```env
    DISCORD_TOKEN=your_discord_bot_token_here
-   CLIENT_ID=your_discord_application_id_here
-   GUILD_ID=your_discord_server_id_here # Optional
+   CLIENT_ID=your_discord_application_client_id_here
+   GUILD_ID=your_discord_server_id_here  # Optional: for faster dev deployment
    ```
 
-4. **Invite the bot to your server**:
-   - Go to Discord Developer Portal > Your App > OAuth2 > URL Generator
-   - Select scopes: `bot` and `applications.commands`
-   - Select bot permissions: `Send Messages`, `Use Slash Commands`, `Embed Links`
-   - Use the generated URL to invite your bot
-
-5. **Deploy slash commands**:
+4. **Deploy slash commands**
    ```bash
    npm run deploy
    ```
 
-6. **Start the bot**:
+5. **Start the bot**
    ```bash
    npm start
    ```
 
-### Development
+## 🔧 Environment Variables
 
-For development with auto-restart:
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DISCORD_TOKEN` | ✅ | Your Discord bot token from Discord Developer Portal |
+| `CLIENT_ID` | ✅ | Your Discord application client ID |
+| `GUILD_ID` | ❌ | Your Discord server ID (speeds up command deployment) |
+| `SCRIPTBLOX_API_BASE` | ❌ | ScriptBlox API base URL (default: https://scriptblox.com/api) |
+| `SCRIPTBLOX_API_KEY` | ❌ | ScriptBlox API key (if required) |
+
+## 🎯 Commands
+
+| Command | Description | Parameters |
+|---------|-------------|------------|
+| `/search` | Search for scripts with advanced filters | query, limit, game, scripttype, verified |
+| `/trending` | Get community most interactive scripts | limit |
+| `/game` | Get scripts for a specific game | game, limit |
+| `/script` | Get detailed script information | script_id |
+| `/raw` | Get raw script code | script_id |
+| `/help` | Show comprehensive help information | - |
+
+### `/search` - Advanced Script Search
+Search for scripts with powerful filtering options:
+- **Query**: Script name or description keywords
+- **Game**: Filter by specific Roblox game
+- **Script Type**: Free, Paid, or Any
+- **Verified Only**: Show only verified scripts
+- **Max Results**: Limit number of results (1-20)
+
+### `/trending` - Trending Scripts
+Browse community trending scripts with:
+- **Limit**: Number of scripts to show (1-10)
+- **Interactive Navigation**: Browse through pages
+- **Rich Metadata**: Views, likes, verification status
+
+### `/script` - Detailed Script Information
+Get comprehensive details about any script:
+- **Script ID**: Enter the ScriptBlox script ID
+- **Complete Metadata**: Author, game, stats, creation date
+- **Interactive Buttons**: View code, visit page
+
+### `/raw` - Raw Script Code
+View and copy raw script code:
+- **Script ID**: Enter the ScriptBlox script ID
+- **Formatted Display**: Clean code presentation
+- **Copy-Friendly**: Easy to copy and use
+
+### `/game` - Game-Specific Scripts
+Find scripts for specific Roblox games:
+- **Game Name**: Search by game title
+- **Filtered Results**: Only scripts for that game
+- **Verification Filters**: Show verified scripts only
+
+### `/help` - Interactive Help
+Comprehensive command documentation with:
+- **Command Explanations**: Detailed usage instructions
+- **Parameter Guides**: Required and optional parameters
+- **Example Usage**: Practical command examples
+
+## 🛠️ Development
+
+### Running in Development Mode
 ```bash
-npm run dev
+npm run dev  # Uses nodemon for auto-restart
 ```
 
-## Configuration
-
-### Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `DISCORD_TOKEN` | Discord bot token | ✅ |
-| `CLIENT_ID` | Discord application ID | ✅ |
-| `GUILD_ID` | Discord server ID (optional, for faster dev updates) | ❌ |
-
-### Bot Permissions
-
-The bot requires the following Discord permissions:
-- Use Slash Commands
-- Send Messages
-- Embed Links
-- Read Message History
-
-## API Integration
-
-This bot integrates with the ScriptBlox API to fetch:
-- Advanced script search results with filters
-- Featured scripts from homepage
-- Trending community scripts
-- Individual script details and raw code
-- Game-specific scripts
-- Script metadata (views, likes, author info)
-
-### API Endpoints Used
-- `/api/script/search` - Search scripts with advanced filters
-- `/api/script/fetch` - Fetch scripts with sorting options
-- `/api/script/trending` - Get community trending scripts
-- `/api/script/:id` - Get individual script details
-- `/api/script/raw/:id` - Get raw script code
-
-## Deployment Options
-
-### Heroku (Recommended)
-- **Cost**: ~$5/month for Eco dyno
-- **Pros**: Easy deployment, automatic scaling, built-in monitoring
-- **Cons**: Requires payment (free tier discontinued)
-
-### Local Hosting
-- **Cost**: Free (uses your computer/server)
-- **Pros**: No monthly cost, full control
-- **Cons**: Requires keeping computer/server running 24/7
-- Game-specific scripts
-- Script metadata (views, likes, author info)
-
-## Project Structure
-
+### Project Structure
 ```
 src/
-├── commands/           # Slash command handlers
-│   ├── search.js      # Search scripts command
-│   ├── featured.js    # Featured scripts command
-│   ├── script.js      # Script details command
-│   ├── game.js        # Game scripts command
+├── commands/           # Discord slash commands
+│   ├── search.js      # Script search functionality
+│   ├── trending.js    # Trending scripts
+│   ├── script.js      # Script details
+│   ├── raw.js         # Raw script code
+│   ├── game.js        # Game-specific scripts
 │   └── help.js        # Help command
-├── services/          # External service integrations
-│   └── scriptblox.js  # ScriptBlox API service
-├── index.js           # Main bot file
-└── deploy-commands.js # Command deployment script
+├── services/
+│   └── scriptblox.js  # ScriptBlox API integration
+├── deploy-commands.js # Command deployment utility
+└── index.js          # Bot main entry point
 ```
 
-## Error Handling
+### Available Scripts
+- `npm start` - Start the bot in production mode
+- `npm run dev` - Start with auto-restart (development)
+- `npm run deploy` - Deploy slash commands to Discord
+- `npm test` - Run tests (not implemented)
 
-The bot includes comprehensive error handling:
-- API rate limiting protection
-- Network error recovery
-- Invalid input validation
-- Graceful failure messages
+## 🔗 API Integration
 
-## Contributing
+This bot integrates with the official ScriptBlox API endpoints:
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+- **`/script/search`** - Advanced script search with filters
+- **`/script/trending`** - Community trending scripts
+- **`/script/:id`** - Individual script details
+- **`/script/raw/:id`** - Raw script content
+- **`/script/fetch`** - Fetch scripts with game filters
 
-## License
+All endpoints are fully documented and compliant with the [ScriptBlox API Documentation](https://scriptblox.com/docs).
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 🚀 Deployment
 
-## Support
+### Local Development
+1. Follow the installation steps above
+2. Use `npm run dev` for development with auto-restart
+3. Test commands in your Discord server
 
-For support, please:
-1. Check the issues section
-2. Create a new issue with detailed information
-3. Join our Discord server (if available)
+### Production Deployment
+1. Set up a VPS or cloud server
+2. Clone the repository and install dependencies
+3. Configure environment variables
+4. Use a process manager like PM2:
+   ```bash
+   npm install -g pm2
+   pm2 start src/index.js --name scriptblox-bot
+   ```
 
-## Disclaimer
+### Heroku Deployment
+The project includes Heroku deployment scripts:
+```bash
+./deploy-heroku.bat  # Windows
+./deploy-heroku.sh   # Linux/Mac
+```
 
-This bot is not officially affiliated with ScriptBlox. It uses their public API to provide script information. Please respect their terms of service and rate limits.
+## 🎮 Bot Permissions
+
+The bot requires the following Discord permissions:
+- **Use Slash Commands** - For command functionality
+- **Send Messages** - To respond to commands
+- **Embed Links** - For rich script displays
+- **Read Message History** - For interaction handling
+
+## 📋 Getting Discord Bot Token
+
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
+2. Click "New Application" and give it a name
+3. Go to "Bot" section and click "Add Bot"
+4. Copy the bot token (keep it secret!)
+5. Under "Privileged Gateway Intents", enable if needed
+6. Go to OAuth2 > URL Generator:
+   - Scopes: `bot` and `applications.commands`
+   - Permissions: `Send Messages`, `Use Slash Commands`, `Embed Links`
+   - Use generated URL to invite bot to your server
+
+## 🤝 Contributing
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Development Guidelines
+- Follow existing code style and structure
+- Test all commands thoroughly before submitting
+- Update documentation for new features
+- Ensure API compliance with ScriptBlox documentation
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Bot not responding to commands:**
+- Check bot is online and has proper permissions
+- Verify slash commands are deployed (`npm run deploy`)
+- Check console for error messages
+
+**API errors:**
+- ScriptBlox API may be temporarily down
+- Check your internet connection
+- Verify API endpoints in documentation
+
+**Environment variable errors:**
+- Double-check `.env` file exists and has correct values
+- Ensure no spaces around the `=` sign
+- Restart bot after changing environment variables
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Issues**: [GitHub Issues](https://github.com/wjybgnia/scriptblox-discord-bot/issues)
+- **Documentation**: [ScriptBlox API Docs](https://scriptblox.com/docs)
+- **Discord.js Guide**: [Discord.js Documentation](https://discord.js.org/)
+
+## ⚠️ Disclaimer
+
+This bot is not officially affiliated with ScriptBlox or Roblox Corporation. It uses the public ScriptBlox API to provide script information. Please respect their terms of service and rate limits.
+
+## 🎉 Acknowledgments
+
+- **ScriptBlox** for providing the comprehensive Roblox script API
+- **Discord.js** for the excellent Discord bot framework
+- **Roblox Community** for script sharing and development
+
+---
+
+**Made with ❤️ for the Roblox scripting community**
