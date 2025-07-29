@@ -7,10 +7,19 @@ class ScriptBloxAPI {
         
         this.client = axios.create({
             baseURL: this.baseURL,
-            timeout: 10000,
+            timeout: 15000,
             headers: {
                 'Content-Type': 'application/json',
-                'User-Agent': 'ScriptBlox-Discord-Bot/1.0.0'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Referer': 'https://scriptblox.com/',
+                'Origin': 'https://scriptblox.com',
+                'Connection': 'keep-alive',
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-origin'
             }
         });
 
@@ -196,13 +205,18 @@ class ScriptBloxAPI {
             const { status, data } = error.response;
             const message = data.message || data.error || 'Unknown error';
             
+            // Check for Cloudflare blocking
+            if (typeof data === 'string' && data.includes('Cloudflare') && data.includes('blocked')) {
+                return new Error('ScriptBlox API access blocked by Cloudflare. Server IP may be blacklisted. Please contact support or use a different server.');
+            }
+            
             switch (status) {
                 case 400:
                     return new Error(`Bad Request: ${message}`);
                 case 401:
                     return new Error('Unauthorized: Invalid API key or authentication required');
                 case 403:
-                    return new Error('Forbidden: Access denied to this resource');
+                    return new Error('Forbidden: Access denied to this resource. Server may be blocked by ScriptBlox.');
                 case 404:
                     return new Error('Not Found: Resource does not exist');
                 case 410:
@@ -222,7 +236,7 @@ class ScriptBloxAPI {
             }
         } else if (error.request) {
             // No response received
-            return new Error('No response from ScriptBlox API. Please try again later.');
+            return new Error('No response from ScriptBlox API. Server may be blocked by Cloudflare. Please try again later.');
         } else {
             // Request setup error
             return new Error(`Request Error: ${error.message}`);
