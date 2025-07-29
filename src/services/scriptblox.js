@@ -113,45 +113,6 @@ class ScriptBloxAPI {
     }
 
     /**
-     * Get scripts with filtering options
-     * @param {Object} options - Filter options
-     * @param {number} options.page - Page number (default: 1)
-     * @param {number} options.max - Results per page (default: 10, max: 20)
-     * @param {string} options.exclude - Script ID to exclude from results
-     * @param {string} options.mode - Script type: 'free' or 'paid'
-     * @param {boolean} options.verified - Whether script is verified
-     * @param {boolean} options.key - Whether script has key system
-     * @param {boolean} options.universal - Whether script is universal
-     * @param {boolean} options.patched - Whether script is patched
-     * @param {string} options.sortBy - Sort by: 'views', 'likeCount', 'createdAt', 'updatedAt', 'dislikeCount'
-     * @param {string} options.order - Sort order: 'asc' or 'desc'
-     * @returns {Promise<Object>} Filtered scripts
-     */
-    async getScripts(options = {}) {
-        try {
-            const params = {
-                page: options.page || 1,
-                max: Math.min(options.max || 10, 20)
-            };
-
-            // Add optional parameters (convert booleans to 1/0 as per API docs)
-            if (options.exclude) params.exclude = options.exclude;
-            if (options.mode) params.mode = options.mode;
-            if (options.verified !== undefined) params.verified = options.verified ? 1 : 0;
-            if (options.key !== undefined) params.key = options.key ? 1 : 0;
-            if (options.universal !== undefined) params.universal = options.universal ? 1 : 0;
-            if (options.patched !== undefined) params.patched = options.patched ? 1 : 0;
-            if (options.sortBy) params.sortBy = options.sortBy;
-            if (options.order) params.order = options.order;
-
-            const response = await this.client.get('/script/fetch', { params });
-            return response.data;
-        } catch (error) {
-            throw this.handleError(error);
-        }
-    }
-
-    /**
      * Get a specific script by ID
      * Response format: { "script": { "_id": "string", "title": "string", ... } }
      * @param {string} scriptId - Script ID
