@@ -21,11 +21,12 @@
 - Shows currently trending scripts  
 - **Status**: No blocking issues detected
 
-### 4. `/game [id]` ⚠️ **IMPROVED WITH FALLBACK**
-- Gets scripts for specific game ID
-- Now uses intelligent search fallback when direct API is blocked
-- Example: `/game 155615604` or `/game Arsenal`
-- **Status**: Enhanced to work around Cloudflare blocking
+### 4. `/game [id]` ✅ **FIXED + IMPROVED**
+- Gets scripts for specific game ID using correct `/script/fetch?game={id}` endpoint
+- Enhanced with intelligent search fallback when needed
+- Fixed to use proper API endpoint as per ScriptBlox documentation
+- Example: `/game 920587237` or `/game Arsenal`
+- **Status**: Fixed endpoint + fallback mechanisms work around any blocking
 
 ### 5. `/random` ⚠️ **MAY BE AFFECTED**
 - Shows random scripts
@@ -55,11 +56,12 @@
 **Problem**: ScriptBlox's Cloudflare protection occasionally blocks the server IP (157.230.40.134)
 
 **Current Solutions**:
-1. ✅ Improved search fallback in `/game` command
-2. ✅ Enhanced `/status` command with per-endpoint monitoring
-3. ✅ Browser-like headers to mimic real users
-4. ✅ Intelligent error handling with helpful alternatives
-5. ✅ Multiple endpoint redundancy
+1. ✅ Fixed `/game` command to use correct `/script/fetch?game={id}` endpoint
+2. ✅ Enhanced search fallback when any endpoint blocked
+3. ✅ Improved `/status` command with per-endpoint monitoring
+4. ✅ Browser-like headers to mimic real users
+5. ✅ Intelligent error handling with helpful alternatives
+6. ✅ Multiple endpoint redundancy
 
 **Real-time Monitoring**:
 - ✅ `/status` command shows which endpoints are working
@@ -86,9 +88,9 @@ To test the bot, try these commands in Discord:
 ```
 
 **Expected Status Output**:
-- **HEALTHY**: All endpoints working normally
-- **PARTIAL**: Some endpoints blocked, others working (common)
-- **UNHEALTHY**: All endpoints blocked (rare)
+- **HEALTHY**: All endpoints working normally (should be expected now!)
+- **PARTIAL**: Some endpoints blocked, others working (less likely after fix)
+- **UNHEALTHY**: All endpoints blocked (very rare)
 
 ## Auto-Update Status
 
