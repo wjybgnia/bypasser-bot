@@ -11,7 +11,7 @@ module.exports = {
                 .setRequired(true))
         .addIntegerOption(option =>
             option.setName('limit')
-                .setDescription('Number of results (1-20)')
+                .setDescription('Number of results (1-20, default: 20)')
                 .setMinValue(1)
                 .setMaxValue(20)
                 .setRequired(false))
@@ -74,7 +74,7 @@ module.exports = {
 
         const query = interaction.options.getString('query');
         const options = {
-            max: interaction.options.getInteger('limit') || 5,
+            max: interaction.options.getInteger('limit') || 20, // Match official API default
             page: interaction.options.getInteger('page') || 1,
             mode: interaction.options.getString('mode'),
             verified: interaction.options.getBoolean('verified'),
@@ -83,7 +83,7 @@ module.exports = {
             patched: interaction.options.getBoolean('patched'),
             sortBy: interaction.options.getString('sortby'),
             order: interaction.options.getString('order') || 'desc',
-            strict: interaction.options.getBoolean('strict')
+            strict: interaction.options.getBoolean('strict') !== false // Default to true as per API docs
         };
 
         // Remove null/undefined values

@@ -30,19 +30,20 @@ class ScriptBloxAPI {
     }
 
     /**
-     * Search for scripts with advanced options
-     * @param {string} query - Search query
+     * Search for scripts with advanced options - Official API Compliant
+     * API Path: /api/script/search
+     * @param {string} query - Search query (required)
      * @param {Object} options - Search options
      * @param {number} options.page - Page number (default: 1)
-     * @param {number} options.max - Results per page (default: 10, max: 20)
+     * @param {number} options.max - Results per page (default: 20, max: 20)
      * @param {string} options.mode - Script type: 'free' or 'paid'
      * @param {boolean} options.patched - Whether script is patched (converted to 1/0)
      * @param {boolean} options.key - Whether script has key system (converted to 1/0)
      * @param {boolean} options.universal - Whether script is universal (converted to 1/0)
      * @param {boolean} options.verified - Whether script is verified (converted to 1/0)
-     * @param {string} options.sortBy - Sort by: 'views', 'likeCount', 'createdAt', 'updatedAt', 'dislikeCount', 'accuracy'
-     * @param {string} options.order - Sort order: 'asc' or 'desc'
-     * @param {boolean} options.strict - Strict search matching (true/false)
+     * @param {string} options.sortBy - Sort by: 'views', 'likeCount', 'createdAt', 'updatedAt', 'dislikeCount', 'accuracy' (default: 'updatedAt')
+     * @param {string} options.order - Sort order: 'asc' or 'desc' (default: 'desc')
+     * @param {boolean} options.strict - Strict search matching (default: true)
      * @returns {Promise<Object>} Search results
      */
     async searchScripts(query = '', options = {}) {
@@ -50,18 +51,19 @@ class ScriptBloxAPI {
             const params = {
                 q: query,
                 page: options.page || 1,
-                max: Math.min(options.max || 10, 20)
+                max: Math.min(options.max || 20, 20) // Official default is 20
             };
 
             // Add optional parameters (convert booleans to 1/0 as per API docs)
             if (options.mode) params.mode = options.mode;
-            if (options.exclude) params.exclude = options.exclude;
             if (options.patched !== undefined) params.patched = options.patched ? 1 : 0;
             if (options.key !== undefined) params.key = options.key ? 1 : 0;
             if (options.universal !== undefined) params.universal = options.universal ? 1 : 0;
             if (options.verified !== undefined) params.verified = options.verified ? 1 : 0;
             if (options.sortBy) params.sortBy = options.sortBy;
             if (options.order) params.order = options.order;
+            
+            // Handle strict parameter as true/false (not 1/0)
             if (options.strict !== undefined) params.strict = options.strict;
 
             const response = await this.client.get('/script/search', { params });
