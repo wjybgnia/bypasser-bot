@@ -24,7 +24,38 @@ module.exports = {
 
         try {
             const api = new ScriptBloxAPI();
-            const results = await api.getGameScripts(gameId, 1, limit);
+            let results;
+            
+            // Try direct game endpoint first
+            try {
+                results = await api.getGameScripts(gameId, 1, limit);
+            } catch (directError) {
+                // If direct game endpoint fails due to blocking, try search as fallback
+                if (directError.message.includes('Forbidden') || directError.message.includes('blocked')) {
+                    console.log('Game endpoint blocked, trying search fallback...');
+                    
+                    // Try to search for scripts related to this game
+                    const searchResults = await api.searchScripts(`gameId:${gameId}`, { 
+                        max: limit,
+                        page: 1 
+                    });
+                    
+                    if (searchResults && searchResults.result && searchResults.result.scripts) {
+                        // Filter results to only include scripts from the specific game
+                        const gameScripts = searchResults.result.scripts.filter(script => 
+                            script.game && script.game.gameId && script.game.gameId.toString() === gameId
+                        );
+                        
+                        results = {
+                            result: { scripts: gameScripts }
+                        };
+                    } else {
+                        throw directError; // Fallback failed, use original error
+                    }
+                } else {
+                    throw directError; // Not a blocking issue, throw original error
+                }
+            }
 
             if (!results.result || !results.result.scripts || results.result.scripts.length === 0) {
                 const embed = new EmbedBuilder()
@@ -78,11 +109,26 @@ module.exports = {
 
         } catch (error) {
             console.error('Game command error:', error);
+
+            let errorMessage = 'Failed to fetch game scripts. Please check the game ID and try again.';
+            let embedColor = '#ff6b6b';
             
+            // Check if it's a Cloudflare blocking issue
+            if (error.message.includes('Forbidden') || error.message.includes('blocked') || error.message.includes('Cloudflare')) {
+                errorMessage = `🚧 **ScriptBlox API Temporarily Unavailable**\n\n` +
+                              `The ScriptBlox API is currently blocking requests from this server. This is a temporary issue.\n\n` +
+                              `**Alternative ways to find scripts for game ID \`${gameId}\`:**\n` +
+                              `• Visit: https://scriptblox.com/\n` +
+                              `• Search for your game directly on the website\n` +
+                              `• Try other commands like \`/search\` or \`/featured\`\n\n` +
+                              `*This issue is being worked on and should be resolved soon.*`;
+                embedColor = '#ffa500';
+            }
+
             const errorEmbed = new EmbedBuilder()
-                .setColor('#ff6b6b')
+                .setColor(embedColor)
                 .setTitle('❌ Error')
-                .setDescription('Failed to fetch game scripts. Please check the game ID and try again.')
+                .setDescription(errorMessage)
                 .setTimestamp();
 
             await interaction.editReply({ embeds: [errorEmbed] });
