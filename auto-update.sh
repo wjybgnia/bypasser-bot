@@ -35,19 +35,31 @@ if [ "$LOCAL" != "$REMOTE" ]; then
     if git pull origin main 2>> "$LOG_FILE"; then
         log_message "Successfully pulled changes"
         
-        # Install any new dependencies
+        # Install any new dependencies for both bot and webhook server
+        log_message "Installing dependencies..."
         npm install --production 2>> "$LOG_FILE"
         
-        # Restart the bot
+        # Ensure express is installed for webhook server
+        npm install express 2>> "$LOG_FILE"
+        
+        # Restart the Discord bot
         if pm2 restart scriptblox-discord-bot 2>> "$LOG_FILE"; then
-            log_message "Bot restarted successfully"
+            log_message "Discord bot restarted successfully"
         else
-            log_message "ERROR: Failed to restart bot"
+            log_message "ERROR: Failed to restart Discord bot"
+        fi
+        
+        # Restart the webhook server
+        if pm2 restart webhook-server 2>> "$LOG_FILE"; then
+            log_message "Webhook server restarted successfully"
+        else
+            log_message "ERROR: Failed to restart webhook server"
         fi
         
         # Deploy commands if needed
+        log_message "Deploying Discord commands..."
         npm run deploy 2>> "$LOG_FILE"
-        log_message "Commands redeployed"
+        log_message "Commands redeployed successfully"
         
     else
         log_message "ERROR: Failed to pull changes"
