@@ -1,52 +1,80 @@
-# Sc## Features
-
-- 🔍 **Advanced Search**: Search with multiple filters, sorting options, and relevance ranking
-- ⭐ **Featured Scripts**: Get the latest featured scripts
-- 🔧 **Advanced Filtering**: Filter scripts by type, verification status, key requirements, and more
-- 📜 **Script Details**: View detailed information about specific scripts
-- 🎮 **Game Scripts**: Find scripts for specific Roblox games
-- 💻 **Script Code**: View script code directly in Discord (with button interaction)
-- 📊 **Sorting Options**: Sort by views, likes, creation date, relevance, and more
-- 🎯 **Search Matches**: See which parts of scripts matched your search query
-- 🔐 **Key Links**: Direct access to script key pages when available
-- 🔗 **Direct Links**: Quick access to ScriptBlox websiteiscord Bot
+# ScriptBlox Discord Bot
 
 A Discord bot that integrates with the ScriptBlox API to provide easy access to Roblox scripts directly from Discord.
 
 ## Features
 
-- 🔍 **Search Scripts**: Search for scripts using keywords
-- ⭐ **Featured Scripts**: Get the latest featured scripts
-- � **Advanced Filtering**: Filter scripts by type, verification status, key requirements, and more
-- �📜 **Script Details**: View detailed information about specific scripts
+- 🔍 **Advanced Search**: Search with multiple filters, sorting options, and relevance ranking
+- ⭐ **Featured Scripts**: Get the latest featured scripts from ScriptBlox homepage
+- � **Trending Scripts**: View community's most interactive scripts
 - 🎮 **Game Scripts**: Find scripts for specific Roblox games
-- 💻 **Script Code**: View script code directly in Discord (with button interaction)
-- 📊 **Sorting Options**: Sort by views, likes, creation date, and more
+- 📜 **Script Details**: View detailed information about specific scripts
+- 💻 **Raw Script Code**: View script code directly in Discord
+- � **Advanced Filtering**: Filter scripts by type, verification status, key requirements, and more
+- 📊 **Sorting Options**: Sort by views, likes, creation date, relevance, and more
+- 🎯 **Search Matches**: See which parts of scripts matched your search query
+- 🔐 **Key Links**: Direct access to script key pages when available
 - 🔗 **Direct Links**: Quick access to ScriptBlox website
+- 💡 **API Health**: Monitor ScriptBlox API status and compatibility
 
 ## Commands
 
-| Command | Description | Usage |
-|---------|-------------|-------|
-| `/search` | Search for scripts | `/search <query> [limit]` |
-| `/featured` | Get featured scripts | `/featured [limit]` |
-| `/script` | Get script details | `/script <id>` |
-| `/game` | Get scripts for a game | `/game <game_id> [limit]` |
-| `/help` | Show help information | `/help` |
+| Command | Description | Usage | Parameters |
+|---------|-------------|-------|------------|
+| `/search` | Search for scripts with advanced filters | `/search <query>` | query, limit, mode, verified, key, universal, patched, strict, sortby, order |
+| `/featured` | Get featured scripts from homepage | `/featured` | limit |
+| `/trending` | Get community most interactive scripts | `/trending` | limit |
+| `/game` | Get scripts for a specific game | `/game <game_id>` | game_id, limit |
+| `/script` | Get detailed script information | `/script <script_id>` | script_id |
+| `/raw` | Get raw script code | `/raw <script_id>` | script_id |
+| `/status` | Check ScriptBlox API health status | `/status` | - |
+| `/help` | Show comprehensive help information | `/help` | - |
 
-## Setup Instructions
+## Quick Setup (Heroku)
 
 ### Prerequisites
 
 - Node.js 16.0.0 or higher
 - Discord Application and Bot Token
 - ScriptBlox API access (optional for enhanced features)
+### 🚀 Easy Deployment (Recommended)
+
+**Option 1: Automated Script**
+```bash
+# Windows
+.\deploy-heroku.bat
+
+# Mac/Linux
+chmod +x deploy-heroku.sh
+./deploy-heroku.sh
+```
+
+**Option 2: Manual Heroku Deployment**
+1. Install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+2. Login: `heroku login`
+3. Create app: `heroku create your-bot-name`
+4. Set environment variables:
+   ```bash
+   heroku config:set DISCORD_TOKEN=your_discord_bot_token
+   heroku config:set CLIENT_ID=your_discord_client_id
+   heroku config:set GUILD_ID=your_discord_guild_id_optional
+   ```
+5. Deploy: `git push heroku main`
+6. Scale worker: `heroku ps:scale worker=1`
+
+## Local Setup Instructions
+
+### Prerequisites
+
+- Node.js 16.0.0 or higher
+- Discord Application and Bot Token
+- Git
 
 ### Installation
 
 1. **Clone and setup the project**:
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/wjybgnia/scriptblox-discord-bot.git
    cd scriptblox-discord-bot
    npm install
    ```
@@ -67,11 +95,7 @@ A Discord bot that integrates with the ScriptBlox API to provide easy access to 
    ```env
    DISCORD_TOKEN=your_discord_bot_token_here
    CLIENT_ID=your_discord_application_id_here
-   GUILD_ID=your_discord_server_id_here # Optional: for faster command updates during development
-   SCRIPTBLOX_API_BASE=https://scriptblox.com/api
-   SCRIPTBLOX_API_KEY=your_scriptblox_api_key_here # Optional: for enhanced rate limits
-   PREFIX=!
-   OWNER_ID=your_discord_user_id_here
+   GUILD_ID=your_discord_server_id_here # Optional
    ```
 
 4. **Invite the bot to your server**:
@@ -105,11 +129,7 @@ npm run dev
 |----------|-------------|----------|
 | `DISCORD_TOKEN` | Discord bot token | ✅ |
 | `CLIENT_ID` | Discord application ID | ✅ |
-| `GUILD_ID` | Discord server ID (for dev) | ❌ |
-| `SCRIPTBLOX_API_BASE` | ScriptBlox API base URL | ❌ |
-| `SCRIPTBLOX_API_KEY` | ScriptBlox API key | ❌ |
-| `PREFIX` | Bot prefix for text commands | ❌ |
-| `OWNER_ID` | Bot owner Discord ID | ❌ |
+| `GUILD_ID` | Discord server ID (optional, for faster dev updates) | ❌ |
 
 ### Bot Permissions
 
@@ -117,13 +137,36 @@ The bot requires the following Discord permissions:
 - Use Slash Commands
 - Send Messages
 - Embed Links
+- Read Message History
 
 ## API Integration
 
 This bot integrates with the ScriptBlox API to fetch:
-- Script search results
-- Featured scripts
-- Individual script details
+- Advanced script search results with filters
+- Featured scripts from homepage
+- Trending community scripts
+- Individual script details and raw code
+- Game-specific scripts
+- Script metadata (views, likes, author info)
+
+### API Endpoints Used
+- `/api/script/search` - Search scripts with advanced filters
+- `/api/script/fetch` - Fetch scripts with sorting options
+- `/api/script/trending` - Get community trending scripts
+- `/api/script/:id` - Get individual script details
+- `/api/script/raw/:id` - Get raw script code
+
+## Deployment Options
+
+### Heroku (Recommended)
+- **Cost**: ~$5/month for Eco dyno
+- **Pros**: Easy deployment, automatic scaling, built-in monitoring
+- **Cons**: Requires payment (free tier discontinued)
+
+### Local Hosting
+- **Cost**: Free (uses your computer/server)
+- **Pros**: No monthly cost, full control
+- **Cons**: Requires keeping computer/server running 24/7
 - Game-specific scripts
 - Script metadata (views, likes, author info)
 

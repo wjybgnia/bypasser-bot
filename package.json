@@ -7,10 +7,7 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "deploy": "node src/deploy-commands.js",
-    "pm2:start": "pm2 start ecosystem.config.json",
-    "pm2:stop": "pm2 stop scriptblox-discord-bot",
-    "pm2:restart": "pm2 restart scriptblox-discord-bot",
-    "pm2:logs": "pm2 logs scriptblox-discord-bot",
+    "heroku-postbuild": "node src/deploy-commands.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["discord", "bot", "scriptblox", "roblox"],
