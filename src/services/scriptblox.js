@@ -233,14 +233,14 @@ class ScriptBloxAPI {
 
     /**
      * Get trending scripts
-     * @param {number} limit - Number of scripts to fetch (default: 10, max: 20)
+     * @param {number} limit - Number of scripts to fetch (default: 20, max: 20)
      * @returns {Promise<Object>} Trending scripts
      */
-    async getTrendingScripts(limit = 10) {
+    async getTrendingScripts(limit = 20) {
         try {
             const response = await this.client.get('/script/trending', {
                 params: {
-                    max: Math.min(limit, 20)
+                    max: Math.min(limit, 20) // Official default and max is 20
                 }
             });
             return response.data;
