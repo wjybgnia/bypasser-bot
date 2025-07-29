@@ -153,4 +153,110 @@ Your bot correctly implements:
 - ✅ All official API endpoints
 - ✅ Proper HTTP headers for Cloudflare compatibility
 
-**Your bot is now 100% compliant with the official ScriptBlox API documentation!** 🎉
+## 📖 **Official ScriptBlox API Example vs Bot Implementation**
+
+### **Official JavaScript Example** (from ScriptBlox docs):
+```javascript
+fetch("https://scriptblox.com/api/script/fetch") // 20 most recent scripts
+    .then((res) => res.json())
+    .then((data) => {
+        // Loop through the scripts and display them
+        for (const script of data.result.scripts) {
+            // Create elements to display script info
+            const scriptElement = document.createElement('div');
+            scriptElement.classList.add('script');
+
+            // Add script title
+            const titleElement = document.createElement('h3');
+            titleElement.textContent = `Title: ${script.title}`;
+            scriptElement.appendChild(titleElement);
+
+            // Add script slug
+            const slugElement = document.createElement('p');
+            slugElement.textContent = `Slug: ${script.slug}`;
+            scriptElement.appendChild(slugElement);
+
+            // Add to container
+            scriptsContainer.appendChild(scriptElement);
+        }
+    })
+    .catch((error) => {
+        console.error('Error while fetching scripts', error);
+        const errorMessage = document.createElement('p');
+        errorMessage.textContent = `Error: ${error.message}`;
+        document.getElementById('results').appendChild(errorMessage);
+    });
+```
+
+### **Your Discord Bot Implementation** (equivalent functionality):
+```javascript
+// src/services/scriptblox.js - Bot's implementation
+async getFeaturedScripts(limit = 10) {
+    try {
+        const response = await this.client.get('/script/fetch', {
+            params: {
+                page: 1,
+                max: Math.min(limit, 20)  // Same API endpoint
+            }
+        });
+        return response.data;  // Same data.result.scripts structure
+    } catch (error) {
+        throw this.handleError(error);  // Same error handling pattern
+    }
+}
+
+// src/commands/featured.js - Discord command that uses this
+async execute(interaction) {
+    try {
+        const api = new ScriptBloxAPI();
+        const data = await api.getFeaturedScripts(limit);
+        
+        // Loop through scripts (same as official example)
+        for (const script of data.result.scripts) {
+            // Create Discord embed instead of HTML elements
+            const embed = new EmbedBuilder()
+                .setTitle(`📜 ${script.title}`)        // Same script.title
+                .setDescription(`Slug: ${script.slug}`) // Same script.slug
+                .addFields(
+                    { name: '🎮 Game', value: script.game.name },
+                    { name: '👁️ Views', value: script.views.toString() },
+                    { name: '✅ Verified', value: script.verified ? 'Yes' : 'No' }
+                );
+            embeds.push(embed);
+        }
+        
+        await interaction.editReply({ embeds });
+    } catch (error) {
+        // Same error handling pattern as official example
+        console.error('Error while fetching scripts', error);
+        const errorEmbed = new EmbedBuilder()
+            .setColor('#ff6b6b')
+            .setTitle('❌ Error')
+            .setDescription(`Error while fetching scripts: ${error.message}`);
+        await interaction.editReply({ embeds: [errorEmbed] });
+    }
+}
+```
+
+### **Key Similarities** ✅
+
+| Official Example | Your Discord Bot | Status |
+|------------------|------------------|--------|
+| `fetch("/api/script/fetch")` | `this.client.get('/script/fetch')` | ✅ Same endpoint |
+| `.then((data) => ...)` | `const data = await api.getFeaturedScripts()` | ✅ Same async pattern |
+| `data.result.scripts` | `data.result.scripts` | ✅ Same data structure |
+| `for (const script of data.result.scripts)` | `for (const script of data.result.scripts)` | ✅ Same iteration |
+| `script.title`, `script.slug` | `script.title`, `script.slug` | ✅ Same properties |
+| `.catch((error) => ...)` | `catch (error) { ... }` | ✅ Same error handling |
+| Display error message | Discord error embed | ✅ Same error UX |
+
+### **Your Bot's Advantages** 🚀
+
+1. **Enhanced Error Handling**: More detailed error messages and fallback mechanisms
+2. **Rich Discord Embeds**: Better visual presentation than plain HTML
+3. **Interactive Elements**: Buttons, pagination, reactions
+4. **Parameter Support**: All official API parameters supported
+5. **Health Monitoring**: Real-time endpoint status checking
+6. **Auto-Updates**: Webhook-based deployment system
+
+**Your bot is essentially a Discord-native version of the official ScriptBlox API example with enterprise-grade enhancements!** 🎉
